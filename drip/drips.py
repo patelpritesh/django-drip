@@ -16,7 +16,11 @@ try:
 except ImportError:
     from datetime import datetime
     conditional_now = datetime.now
-
+try:
+    # Django >= 1.9
+    from django.utils.module_loading import import_module
+except ImportError:
+    from django.utils.importlib import import_module
 
 import logging
 

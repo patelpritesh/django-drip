@@ -18,6 +18,8 @@ class DripSplitSubject(models.Model):
     subject = models.CharField(max_length=150)
     enabled = models.BooleanField(default=True)
 
+    class Meta:
+        app_label = 'drip'
 
 class Drip(models.Model):
     date = models.DateTimeField(auto_now_add=True)
@@ -39,6 +41,9 @@ class Drip(models.Model):
     body_html_template = models.TextField(null=True, blank=True,
         help_text='You will have settings and user in the context.')
     message_class = models.CharField(max_length=120, blank=True, default='default')
+
+    class Meta:
+        app_label = 'drip'
 
     @property
     def drip(self):
@@ -70,7 +75,6 @@ class Drip(models.Model):
         return random_subject.subject
 
 
-
 class SentDrip(models.Model):
     """
     Keeps a record of all sent drips.
@@ -89,6 +93,8 @@ class SentDrip(models.Model):
         null=True, default=None # For south so that it can migrate existing rows.
     )
 
+    class Meta:
+        app_label = 'drip'
 
 
 METHOD_TYPES = (
@@ -126,6 +132,9 @@ class QuerySetRule(models.Model):
     field_value = models.CharField(max_length=255,
         help_text=('Can be anything from a number, to a string. Or, do ' +
                    '`now-7 days` or `today+3 days` for fancy timedelta.'))
+
+    class Meta:
+        app_label = 'drip'
 
     def clean(self):
         User = get_user_model()
