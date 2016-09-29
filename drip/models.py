@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
-import random
+from __future__ import unicode_literals
+from django.utils.encoding import python_2_unicode_compatible
+from datetime import datetime
 
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -13,6 +14,7 @@ from drip.utils import get_user_model
 import timedelta as djangotimedelta
 
 
+@python_2_unicode_compatible
 class DripSplitSubject(models.Model):
     drip = models.ForeignKey('Drip', related_name='split_test_subjects')
     subject = models.CharField(max_length=150)
@@ -21,6 +23,8 @@ class DripSplitSubject(models.Model):
     class Meta:
         app_label = 'drip'
 
+
+@python_2_unicode_compatible
 class Drip(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     lastchanged = models.DateTimeField(auto_now=True)
@@ -57,7 +61,7 @@ class Drip(models.Model):
                         body_template=self.body_html_template if self.body_html_template else None)
         return drip
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @cached_property
@@ -75,6 +79,7 @@ class Drip(models.Model):
         return random_subject.subject
 
 
+@python_2_unicode_compatible
 class SentDrip(models.Model):
     """
     Keeps a record of all sent drips.
@@ -119,6 +124,8 @@ LOOKUP_TYPES = (
     ('iendswith', 'ends with (case insensitive)'),
 )
 
+
+@python_2_unicode_compatible
 class QuerySetRule(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     lastchanged = models.DateTimeField(auto_now=True)
