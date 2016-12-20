@@ -23,6 +23,9 @@ class DripSplitSubject(models.Model):
     class Meta:
         app_label = 'drip'
 
+    def __str__(self):
+        return str(self.drip.name) +":"+ str(self.subject)
+
 
 @python_2_unicode_compatible
 class Drip(models.Model):
@@ -101,6 +104,9 @@ class SentDrip(models.Model):
     class Meta:
         app_label = 'drip'
 
+    def __str__(self):
+        return str(self.drip.name) +":"+ str(self.subject) +":"+ str(self.date)
+
 
 METHOD_TYPES = (
     ('filter', 'Filter'),
@@ -142,6 +148,9 @@ class QuerySetRule(models.Model):
 
     class Meta:
         app_label = 'drip'
+
+    def __str__(self):
+        return str(self.drip.name) +":"+ str(self.field_name) +":"+ str(self.lookup_type) +":"+ str(self.field_value)
 
     def clean(self):
         User = get_user_model()

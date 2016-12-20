@@ -113,4 +113,6 @@ admin.site.register(Drip, DripAdmin)
 class SentDripAdmin(admin.ModelAdmin):
     list_display = [f.name for f in SentDrip._meta.fields]
     ordering = ['-id']
+    raw_id_fields = ('user', )
+
 admin.site.register(SentDrip, SentDripAdmin)
