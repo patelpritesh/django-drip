@@ -48,6 +48,8 @@ class Drip(models.Model):
     body_html_template = models.TextField(null=True, blank=True,
         help_text='You will have settings and user in the context.')
     message_class = models.CharField(max_length=120, blank=True, default='default')
+    # We use this as a git tracked template file
+    template_file = models.CharField(max_length=160, blank=True, null=True)
 
     class Meta:
         app_label = 'drip'
@@ -61,7 +63,9 @@ class Drip(models.Model):
                         from_email=self.from_email if self.from_email else None,
                         from_email_name=self.from_email_name if self.from_email_name else None,
                         subject_template=self.subject_template if self.subject_template else None,
-                        body_template=self.body_html_template if self.body_html_template else None)
+                        body_template=self.body_html_template if self.body_html_template else None,
+                        template_file=self.template_file if self.template_file else None,
+                    )
         return drip
 
     def __str__(self):

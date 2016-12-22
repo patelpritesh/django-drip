@@ -4,6 +4,7 @@ import functools
 from django.conf import settings
 from django.db.models import Q
 from django.template import Context, Template
+from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 
@@ -73,7 +74,22 @@ class DripMessage(object):
     @property
     def body(self):
         if not self._body:
-            self._body = Template(self.drip_base.body_template).render(self.context)
+
+            if self.drip_base.body_template:
+                self._body = Template(self.drip_base.body_template).render(self.context)
+
+            if self.drip_base.template_file:
+                _template_file = get_template(self.drip_base.template_file)
+                if self._body:
+                    # Template File rendering
+                    # if you want to include body from textbox into the template_file you must specify
+                    # {{BODY_CONTENT}} syntax in template file
+                    _context = self.context
+                    _context.update({ 'BODY_CONTENT': self._body })
+                    self._body = _template_file.render(_context)
+                else:
+                    self._body = _template_file.render(self.context)
+
         return self._body
 
     @property
@@ -112,6 +128,7 @@ class DripBase(object):
     body_template = None
     from_email = None
     from_email_name = None
+    template_file = None
 
     def __init__(self, drip_model, *args, **kwargs):
         self.drip_model = drip_model
@@ -121,6 +138,7 @@ class DripBase(object):
         self.from_email_name = kwargs.pop('from_email_name', self.from_email_name)
         self.subject_template = kwargs.pop('subject_template', self.subject_template)
         self.body_template = kwargs.pop('body_template', self.body_template)
+        self.template_file = kwargs.pop('template_file', self.template_file)
 
         if not self.name:
             raise AttributeError('You must define a name.')
@@ -225,9 +243,9 @@ class DripBase(object):
 
         Returns count of created SentDrips.
         """
-
         if not self.from_email:
             self.from_email = getattr(settings, 'DRIP_FROM_EMAIL', settings.DEFAULT_FROM_EMAIL)
+
         MessageClass = message_class_for(self.drip_model.message_class)
 
         count = 0
@@ -264,4 +282,11 @@ class DripBase(object):
         using a queryset builder from the admin interface...
         """
         User = get_user_model()
-        return User.objects
+        try:
+            # Want to apply extra filter in User Model?
+            # then add new queryset filter with named "can_drip_send_email" to restrict the user set
+            qs = User.objects.can_drip_send_email()
+        except Exception, e:
+            qs = User.objects.all()
+
+        return qs
