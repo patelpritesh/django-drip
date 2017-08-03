@@ -9,7 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 
 from drip.models import SentDrip
-from drip.utils import get_user_model
+from drip.utils import get_user_model, batch_qs
 
 try:
     from django.utils.timezone import now as conditional_now
@@ -249,22 +249,23 @@ class DripBase(object):
         MessageClass = message_class_for(self.drip_model.message_class)
 
         count = 0
-        for user in self.get_queryset():
-            message_instance = MessageClass(self, user)
-            try:
-                result = message_instance.message.send()
-                if result:
-                    SentDrip.objects.create(
-                        drip=self.drip_model,
-                        user=user,
-                        from_email=self.from_email,
-                        from_email_name=self.from_email_name,
-                        subject=message_instance.subject,
-                        #body=message_instance.body
-                    )
-                    count += 1
-            except Exception as e:
-                logging.error("Failed to send drip %s to user %s: %s" % (self.drip_model.id, user, e))
+        for qs in batch_qs(self.get_queryset().order_by('id')):
+            for user in qs:
+                message_instance = MessageClass(self, user)
+                try:
+                    result = message_instance.message.send()
+                    if result:
+                        SentDrip.objects.create(
+                            drip=self.drip_model,
+                            user=user,
+                            from_email=self.from_email,
+                            from_email_name=self.from_email_name,
+                            subject=message_instance.subject,
+                            #body=message_instance.body
+                        )
+                        count += 1
+                except Exception as e:
+                    logging.error("Failed to send drip %s to user %s: %s" % (self.drip_model.id, user, e))
 
         return count
 
