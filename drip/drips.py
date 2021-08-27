@@ -287,7 +287,7 @@ class DripBase(object):
             # Want to apply extra filter in User Model?
             # then add new queryset filter with named "can_drip_send_email" to restrict the user set
             qs = User.objects.can_drip_send_email()
-        except Exception, e:
+        except Exception as e:
             qs = User.objects.all()
 
         return qs

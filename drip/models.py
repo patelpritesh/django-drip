@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
 from datetime import datetime
 
 from django.db import models
@@ -14,9 +13,8 @@ from drip.utils import get_user_model
 import timedelta as djangotimedelta
 
 
-@python_2_unicode_compatible
 class DripSplitSubject(models.Model):
-    drip = models.ForeignKey('Drip', related_name='split_test_subjects')
+    drip = models.ForeignKey('Drip', related_name='split_test_subjects', on_delete=models.CASCADE)
     subject = models.CharField(max_length=150)
     enabled = models.BooleanField(default=True)
 
@@ -27,7 +25,6 @@ class DripSplitSubject(models.Model):
         return str(self.drip.name) +":"+ str(self.subject)
 
 
-@python_2_unicode_compatible
 class Drip(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     lastchanged = models.DateTimeField(auto_now=True)
@@ -86,15 +83,14 @@ class Drip(models.Model):
         return random_subject.subject
 
 
-@python_2_unicode_compatible
 class SentDrip(models.Model):
     """
     Keeps a record of all sent drips.
     """
     date = models.DateTimeField(auto_now_add=True)
 
-    drip = models.ForeignKey('drip.Drip', related_name='sent_drips')
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), related_name='sent_drips')
+    drip = models.ForeignKey('drip.Drip', related_name='sent_drips', on_delete=models.CASCADE)
+    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), related_name='sent_drips', on_delete=models.CASCADE)
 
     subject = models.TextField()
     #body = models.TextField()
@@ -135,12 +131,11 @@ LOOKUP_TYPES = (
 )
 
 
-@python_2_unicode_compatible
 class QuerySetRule(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     lastchanged = models.DateTimeField(auto_now=True)
 
-    drip = models.ForeignKey(Drip, related_name='queryset_rules')
+    drip = models.ForeignKey(Drip, related_name='queryset_rules', on_delete=models.CASCADE)
 
     method_type = models.CharField(max_length=12, default='filter', choices=METHOD_TYPES)
     field_name = models.CharField(max_length=128, verbose_name='Field name of User')

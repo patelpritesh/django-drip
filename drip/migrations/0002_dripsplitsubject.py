@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('subject', models.CharField(max_length=150)),
                 ('enabled', models.BooleanField(default=True)),
-                ('drip', models.ForeignKey(related_name='split_test_subjects', to='drip.Drip')),
+                ('drip', models.ForeignKey(related_name='split_test_subjects', to='drip.Drip', on_delete=models.CASCADE)),
             ],
             options={
             },
