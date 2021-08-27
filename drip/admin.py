@@ -92,9 +92,9 @@ class DripAdmin(admin.ModelAdmin):
             request, object_id, extra_context=self.build_extra_context(extra_context))
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         urls = super(DripAdmin, self).get_urls()
-        my_urls = patterns('',
+        my_urls = [
             url(
                 r'^(?P<drip_id>[\d]+)/timeline/(?P<into_past>[\d]+)/(?P<into_future>[\d]+)/$',
                 self.av(self.timeline),
@@ -105,7 +105,7 @@ class DripAdmin(admin.ModelAdmin):
                 self.av(self.view_drip_email),
                 name='view_drip_email'
             )
-        )
+        ]
         return my_urls + urls
 admin.site.register(Drip, DripAdmin)
 
