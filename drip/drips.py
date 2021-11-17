@@ -62,13 +62,13 @@ class DripMessage(object):
     @property
     def context(self):
         if not self._context:
-            self._context = Context({'user': self.user})
+            self._context = {'user': self.user}
         return self._context
 
     @property
     def subject(self):
         if not self._subject:
-            self._subject = Template(self.drip_base.subject_template).render(self.context)
+            self._subject = Template(self.drip_base.subject_template).render(Context(self.context))
         return self._subject
 
     @property
@@ -76,7 +76,7 @@ class DripMessage(object):
         if not self._body:
 
             if self.drip_base.body_template:
-                self._body = Template(self.drip_base.body_template).render(self.context)
+                self._body = Template(self.drip_base.body_template).render(Context(self.context))
 
             if self.drip_base.template_file:
                 _template_file = get_template(self.drip_base.template_file)
